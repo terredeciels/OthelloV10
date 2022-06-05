@@ -41,7 +41,7 @@ class PerftSpeedTest {
 
         // o.gen(o.trait);
 
-        List<Othello.Coups> moves = o.legalmoves(o);
+        List<Othello.Coups> moves = o.legalmoves();
 
         if (moves.size() != 0) {
             for (Othello.Coups move : moves) {

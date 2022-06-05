@@ -3,34 +3,33 @@ package oth;
 
 import java.util.List;
 
-//  players.put(Side.BLACK, new AlphaBetaPlayer(board, Side.BLACK));
+import static oth.Othello.noir;
+import static oth.Othello.*;
 
 public class AlphaBeta {
     static final int INITIAL_DEPTH = 5;
     static final int TIMEOUT_MILISECONDS = 6000;
-
+    int trait;
     int currentDepth;
-    Othello.Coups bestMove;
-    Othello.Coups globalBestMove;
+    Coups bestMove;
+    Coups globalBestMove;
     long start;
     boolean timeout;
-    ///
     Othello o;
-    Side side;
 
-    public AlphaBeta(Othello o, Side side) {
+    public AlphaBeta(Othello o, int trait) {
         this.o = o;
-        this.side = side;
+        this.trait = trait;
     }
 
-    public Othello.Coups decideMove() {
+    public Coups decideMove() {
         timeout = false;
         start = System.currentTimeMillis();
 
         for (int d = 0; ; d++) {
             if (d > 0) {
                 globalBestMove = bestMove;
-                System.out.println("Recherche terminée avec profondeur " + currentDepth + ". meilleur mouvement jusqu'à présent: " + globalBestMove);
+                System.out.println("Fin de recherche avec profondeur: " + currentDepth + " meilleur mouvement jusqu'a present: " + globalBestMove);
             }
             currentDepth = INITIAL_DEPTH + d;
 
@@ -51,25 +50,22 @@ public class AlphaBeta {
         }
 
         if (depth == 0) {
-            return o.computeRating(Side.BLACK);
+            o.trait=noir;
+            return o.computeRating(noir);
         }
 
-        List<Othello.Coups> legalMoves = o.legalmoves(o);
+        List<Othello.Coups> legalMoves = o.legalmoves();
 
         assert legalMoves != null;
         for (Othello.Coups move : legalMoves) {
+            o.move=move;
 
-            // makeMove(move);
             o.fmove(o.undomove);
-
-            //side = side.opposite();
             o.trait = -o.trait;
 
             int rating = minimizer(depth - 1, alpha, beta);
 
-            //side = side.opposite();
             o.trait = -o.trait;
-            //undoMove(move);
             o.fmove(!o.undomove);
 
             if (rating > alpha) {
@@ -89,20 +85,22 @@ public class AlphaBeta {
 
     private int minimizer(int depth, int alpha, int beta) {
         if (depth == 0) {
-            return o.computeRating(Side.BLACK);
+            o.trait=noir;
+            return o.computeRating(noir);
         }
 
-        List<Move> legalMoves = computeAllLegalMoves();
+        List<Othello.Coups> legalMoves = o.legalmoves();
 
-        for (Move move : legalMoves) {
+        for (Othello.Coups move : legalMoves) {
+            o.move=move;
 
-            makeMove(move);
-            side = side.opposite();
+            o.fmove(!o.undomove);
+            o.trait = -o.trait;
 
             int rating = maximizer(depth - 1, alpha, beta);
 
-            side = side.opposite();
-            undoMove(move);
+            o.trait = -o.trait;
+            o.fmove(!o.undomove);
 
             if (rating <= beta) {
                 beta = rating;
@@ -114,31 +112,5 @@ public class AlphaBeta {
         }
         return beta;
     }
-
-    List<Move> computeAllLegalMoves() {
-        return null;
-    }
-
-    void undoMove(Move move) {
-
-    }
-    ///
-
-    void makeMove(Move move) {
-
-    }
-
-    ///
-    public static class Side {
-        public static Side BLACK;
-
-        public Side opposite() {
-            return null;
-        }
-    }
-
-    static class Move {
-    }
-
 
 }

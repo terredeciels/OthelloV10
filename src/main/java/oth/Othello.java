@@ -20,7 +20,7 @@ public class Othello {
     final static int out = 2;
     final static int max = 1;
     static String filename = "statistiques.txt";
-    static String pathname = "C:\\Users\\gille\\IdeaProjects\\OthelloV2\\";
+    static String pathname = "C:\\Users\\gille\\IdeaProjects\\OthelloV10\\";
     static String[] SCASES = {"xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx",
             "xx", "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8", "xx",
             "xx", "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "xx",
@@ -96,8 +96,8 @@ public class Othello {
         );
     }
 
-    public int computeRating(AlphaBeta.Side side) { //eval de board
-        return 0;
+    public int computeRating(int side) { //eval de board
+        return new Random().nextInt(0,10);
     }
 
     public void jouer() {
@@ -119,8 +119,11 @@ public class Othello {
                 });
 
                 // move = EvalRandom(lcoups.stream().distinct().toList());
-                move = (lcoups.size() != 0) ? lcoups.get(new Random().nextInt(lcoups.size()))
-                        : NOMOVE;
+
+//                move = (lcoups.size() != 0) ? lcoups.get(new Random().nextInt(lcoups.size()))
+//                        : NOMOVE;
+
+                move =  new AlphaBeta(this,noir).decideMove();
 
                 if (move == NOMOVE) if (passe) findepartie = true;
                 else passe = true;
@@ -163,18 +166,18 @@ public class Othello {
 
         }
     }
-   public List<Othello.Coups> legalmoves(Othello o) {
-        range(0, 100).filter(c -> o.etats[c] == vide).forEach(c -> {
-            o.caseO = c;
-            o.lscore = new ArrayList<>();
-            o.DIRS.forEach(d -> {
-                o.dir = d;
-                Othello.Etat etat = o.S0;
+   public List<Othello.Coups> legalmoves() {
+        range(0, 100).filter(c -> etats[c] == vide).forEach(c -> {
+            caseO = c;
+            lscore = new ArrayList<>();
+            DIRS.forEach(d -> {
+                dir = d;
+                Othello.Etat etat = S0;
                 while (true)
-                    if ((etat = etat.exec()) == o.S1 || etat == null) break;
+                    if ((etat = etat.exec()) == S1 || etat == null) break;
             });
         });
-       return o.lcoups.stream().distinct().toList();
+       return lcoups.stream().distinct().toList();
     }
 
     public void fmove(boolean undomove) {
